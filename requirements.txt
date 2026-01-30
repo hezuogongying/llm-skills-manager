@@ -1,0 +1,17 @@
+# LLM Skills Manager - Python 依赖
+
+# 核心依赖
+PyYAML>=6.0
+
+# LLM 后端（根据需要安装）
+openai>=1.0.0              # OpenAI GPT
+anthropic>=0.18.0          # Anthropic Claude
+google-generativeai>=0.3.0 # Google Gemini
+requests>=2.31.0           # Ollama
+
+# Web 应用（可选）
+streamlit>=1.28.0
+
+# 开发/测试（可选）
+pytest>=7.4.0
+coverage>=7.3.0
