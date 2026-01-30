@@ -70,6 +70,11 @@ from .core.services import (
 from .utils import create_skill_template, validate_skill
 
 # ============================================================================
+# 日志配置
+# ============================================================================
+from .infrastructure.config.logging_config import setup_logging, get_logger
+
+# ============================================================================
 # 版本信息
 # ============================================================================
 __version__ = "2.0.0"
@@ -111,4 +116,8 @@ __all__ = [
     # 便捷函数
     'create_skill_template',
     'validate_skill',
+
+    # 日志配置
+    'setup_logging',
+    'get_logger',
 ]

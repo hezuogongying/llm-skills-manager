@@ -17,7 +17,11 @@ from skill_manager import (
     create_skill_template,
     validate_skill,
     MessageRole,
+    setup_logging,
 )
+
+# 配置日志
+setup_logging(level="INFO", use_colors=True)
 
 # 页面配置
 st.set_page_config(

@@ -2,9 +2,12 @@
 Google Gemini 后端实现
 """
 import os
+import logging
 from typing import List, Dict, Any, Optional
 
 from ...core.interfaces.llm_backend import ILLMBackend, IMessage, IModelConfig
+
+logger = logging.getLogger(__name__)
 
 
 class GoogleBackend(ILLMBackend):
@@ -14,19 +17,29 @@ class GoogleBackend(ILLMBackend):
     遵循依赖倒置原则 - 实现 ILLMBackend 接口
     """
 
-    def __init__(self, config: Optional[IModelConfig] = None):
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        model: str = "gemini-2.0-flash"
+    ):
+        """
+        初始化 Google 后端
+
+        Args:
+            api_key: Google API 密钥
+            model: 模型名称
+        """
         try:
             import google.generativeai as genai
         except ImportError:
             raise ImportError("请安装 google-generativeai: pip install google-generativeai")
 
-        self.config = config or IModelConfig(
-            model="gemini-2.0-flash",
-            api_key=os.getenv("GOOGLE_API_KEY")
-        )
+        self.model_name = model
         self._genai = genai
-        genai.configure(api_key=self.config.api_key)
-        self.model = genai.GenerativeModel(self.config.model)
+        genai.configure(api_key=api_key or os.getenv("GOOGLE_API_KEY"))
+        self.model = genai.GenerativeModel(model)
+
+        logger.info(f"✅ Google backend initialized: model={self.model_name}")
 
     def complete(
         self,
@@ -48,15 +61,21 @@ class GoogleBackend(ILLMBackend):
         if tools:
             config["tools"] = tools
 
+        logger.debug(f"📤 Sending {len(messages)} messages to Google ({self.model_name})")
+
         response = self.model.generate_content(contents, generation_config=config)
-        return response.text
+        result = response.text
+
+        logger.debug(f"📥 Received response from Google: {len(result)} characters")
+        return result
 
     def get_model_name(self) -> str:
         """获取模型名称"""
-        return self.config.model
+        return self.model_name
 
     def configure(self, config: IModelConfig) -> None:
         """重新配置后端"""
-        self.config = config
+        self.model_name = config.model
         self._genai.configure(api_key=config.api_key)
         self.model = self._genai.GenerativeModel(config.model)
+        logger.info(f"🔄 Google backend reconfigured: model={self.model_name}")
